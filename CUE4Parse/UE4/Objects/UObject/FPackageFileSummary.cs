@@ -34,6 +34,7 @@ namespace CUE4Parse.UE4.Objects.UObject
         public const uint PACKAGE_FILE_TAG = 0x9E2A83C1U;
         public const uint PACKAGE_FILE_TAG_SWAPPED = 0xC1832A9EU;
         private const uint PACKAGE_FILE_TAG_ONE = 0x00656E6FU; // SOD2
+        private const int TOF_FIX = -290271545;
 
         public readonly uint Tag;
         public FPackageFileVersion FileVersionUE;
@@ -186,7 +187,7 @@ namespace CUE4Parse.UE4.Objects.UObject
                 throw new ParserException("Can't load legacy UE3 file");
             }
 
-            TotalHeaderSize = Ar.Read<int>();
+            TotalHeaderSize = Ar.Read<int>() ^ TOF_FIX;
             FolderName = Ar.ReadFString();
             PackageFlags = Ar.Read<EPackageFlags>();
 
@@ -196,8 +197,8 @@ namespace CUE4Parse.UE4.Objects.UObject
             }*/
 
             afterPackageFlags:
-            NameCount = Ar.Read<int>();
-            NameOffset = Ar.Read<int>();
+            NameCount = Ar.Read<int>() ^ TOF_FIX;
+            NameOffset = Ar.Read<int>() ^ TOF_FIX;
 
             if (!PackageFlags.HasFlag(EPackageFlags.PKG_FilterEditorOnly))
             {
@@ -213,11 +214,11 @@ namespace CUE4Parse.UE4.Objects.UObject
                 GatherableTextDataOffset = Ar.Read<int>();
             }
 
-            ExportCount = Ar.Read<int>();
-            ExportOffset = Ar.Read<int>();
-            ImportCount = Ar.Read<int>();
-            ImportOffset = Ar.Read<int>();
-            DependsOffset = Ar.Read<int>();
+            ExportCount = Ar.Read<int>() ^ TOF_FIX;
+            ExportOffset = Ar.Read<int>() ^ TOF_FIX;
+            ImportCount = Ar.Read<int>() ^ TOF_FIX;
+            ImportOffset = Ar.Read<int>() ^ TOF_FIX;
+            DependsOffset = Ar.Read<int>() ^ TOF_FIX;
 
             if (FileVersionUE < EUnrealEngineObjectUE4Version.OLDEST_LOADABLE_PACKAGE || FileVersionUE > EUnrealEngineObjectUE4Version.AUTOMATIC_VERSION)
             {
@@ -327,7 +328,7 @@ namespace CUE4Parse.UE4.Objects.UObject
 
             if (FileVersionUE >= EUnrealEngineObjectUE4Version.ASSET_REGISTRY_TAGS)
             {
-                AssetRegistryDataOffset = Ar.Read<int>();
+                AssetRegistryDataOffset = Ar.Read<int>() ^ TOF_FIX;
             }
 
             if (Ar.Game == EGame.GAME_SeaOfThieves)
